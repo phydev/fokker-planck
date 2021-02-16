@@ -8,6 +8,9 @@ Sunday, 07 Feb 2021
 import numpy as np
 from scipy.special import expit as H
 from scipy.ndimage import convolve
+from matplotlib import rc
+rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+rc('text', usetex=True)
 
 kwargs = {'origin': 'lower',
           'interpolation': 'sinc',
@@ -43,13 +46,14 @@ def W_E2ER(E2, o_E2ER = o_E2ER, o_E2ER_E2 = o_E2ER_E2):
 
 
 
-def model(nstep, E2, T, D = D):
+def model(nstep, E2, T, D, dt):
 
-    dt = 1.0
-    GFR = np.log10(np.ones(nstep) * 10e-4)
-    ERM = np.log10(np.ones(nstep) * 10e-4)
-    E2ER = np.log10(np.ones(nstep) * 10e-4)
-    E2 = np.log10(E2)
+
+    GFR = np.zeros(nstep)
+    ERM = np.zeros(nstep)
+    E2ER = np.zeros(nstep)
+    E2ER[0] = H(W_E2ER(E2))
+
 
 
     for istep in range(1, nstep):
@@ -63,32 +67,28 @@ def model(nstep, E2, T, D = D):
 
     fig, ax = plt.subplots()
     #ax = plt.axes(projection='3d')
-    ax.plot(GFR[2:], label='GFR')
-    ax.plot(ERM[2:], label='ERM')
-    ax.plot(E2ER[2:], label='E2ER')
+    ax.plot(GFR[0:], label='GFR', color='black')
+    ax.plot(ERM[0:], label='ERM', color='blue')
+    #ax.plot(E2ER[0:], label='E2ER', color='red')
+    ax.set_xlabel('Time')
     #ax.set_yscale('log')
-    #plt.ylim(0,1.1)
+    plt.ylim(0,1.1)
     plt.legend()
     plt.show()
 
     return GFR, ERM, E2ER
 
-
 if __name__ == '__main__':
+
 
     import matplotlib.pyplot as plt
     from matplotlib import cm
 
 
-    nstep = np.int64(2e4)
-    ngrid = np.array([51, 51])
-    L = np.array([[-0.2, 1.2],
-                  [-0.2, 1.2]])
+
+    E2 = 10 #10e-17
+    dt = 1.
 
 
+    GFR, ERM, E2ER = model(100, E2, 10, 0.005, dt)
 
-    E2 = 10e2
-    dt = 10e-5
-    dL = 0.03
-
-    GFR, ERM, E2ER = model(100, E2, 100)
