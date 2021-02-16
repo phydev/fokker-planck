@@ -8,9 +8,6 @@ Sunday, 07 Feb 2021
 import numpy as np
 from scipy.special import expit as H
 from scipy.ndimage import convolve
-from matplotlib import rc
-rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-rc('text', usetex=True)
 
 kwargs = {'origin': 'lower',
           'interpolation': 'sinc',
@@ -84,6 +81,8 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
     from matplotlib import cm
 
+    rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+    rc('text', usetex=True)
 
 
     E2 = 10 #10e-17
