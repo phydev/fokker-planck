@@ -7,5 +7,5 @@
   
   [fokker planck w/ fdm](https://github.com/phydev/systems-oncology/blob/main/journal-club-2/fdm-fokker-planck.py) | Fokker-planck solved with finite differences method (work in progress - the reflective boundary condition must be fixed)
   
-  [fokker planck w/ fem](https://github.com/phydev/systems-oncology/blob/main/journal-club-2/fdm-fokker-planck.py) | Fokker-planck solved with finite elements method
+  [fokker planck w/ fem](https://github.com/phydev/systems-oncology/blob/main/journal-club-2/fem-fokker-planck.py) | Fokker-planck solved with finite elements method
   
