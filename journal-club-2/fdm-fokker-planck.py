@@ -58,57 +58,63 @@ def dderivatives_lapl(f, L, dr=1):
 
 def update_ghost_points(f, L, vx, vy, D=1, dr=1):
 
-    for n in range(1, L[0]-1):
-        f[0, n] = f[1, n] * (1 + dr * vx[1, n] / D)
-        f[n, 0] = f[n, 1] * (1 + dr * vy[n, 1] / D)
+    
+    f[0, :] = f[1, :] * (1 + dr * vx[1, :] / D)
+    f[:, 0] = f[:, 1] * (1 + dr * vy[:, 1] / D)
 
-        f[L[0]-1, n] = f[L[0]-2, n] * (1 + dr * vx[L[0]-2, n] / D)
-        f[n, L[1]-1] = f[n, L[1]-2] * (1 + dr * vy[n, L[1]-2] / D)
+    f[-1, :] = f[-2, :] * (1 + dr * vx[-2, :] / D)
+    f[:, -1] = f[:, -2] * (1 + dr * vy[:, -2] / D)
 
     return f
 
-NGRID = np.array([[-0.2, 1.2],
-                [-0.2, 1.2]])
 
 
 
-E2 = 10e-2
-dt = 10e-5
-dL = 0.5
-nstep=20000
-L = np.array([51, 51])
-x1 = np.linspace(NGRID[0, 0], NGRID[0, 1], L[0])
-x2 = np.linspace(NGRID[1, 0], NGRID[1, 1], L[1])
-GFR, ERM = np.meshgrid(x1, x2)
-p = np.zeros(L)
-p[25,25] = 100.
-#p = np.exp(-((GFR - 0.5) ** 2 + (ERM - 0.5) ** 2))
 
-E2ER = H(W_E2ER(np.log10(E2)))
-F_GFR = γ_GFR * (H(W_GFR(GFR, E2ER, ERM)) - GFR)
-F_ERM = γ_ERM * (H(W_ERM(GFR, E2ER, ERM)) - ERM)
-
-p = update_ghost_points(p, L, F_GFR, F_ERM)
-F_div = np.gradient(F_GFR, dL, axis=0) + np.gradient(F_ERM, dL, axis=1)#dderivatives_div(F_GFR, F_ERM, L, dL)
-
-for istep in range(nstep):
-
-    grad_p = dderivatives_grad(p, L, dL)
-
-    advection = grad_p[0]*F_GFR + grad_p[1]*F_ERM + p*F_div 
-    diffusion = dderivatives_lapl(p, L, dL)
-
-    p = p + dt * ( -advection + diffusion)
-
+if __name__=='__main__':
+    NGRID = np.array([[-0.2, 1.2],
+                    [-0.2, 1.2]])
+    
+    
+    
+    E2 = 10e-2
+    dt = 10e-5
+    dL = 0.5
+    nstep=20000
+    L = np.array([51, 51])
+    x1 = np.linspace(NGRID[0, 0], NGRID[0, 1], L[0])
+    x2 = np.linspace(NGRID[1, 0], NGRID[1, 1], L[1])
+    GFR, ERM = np.meshgrid(x1, x2)
+    p = np.zeros(L)
+    p[25,25] = 100.
+    #p = np.exp(-((GFR - 0.5) ** 2 + (ERM - 0.5) ** 2))
+    
+    E2ER = H(W_E2ER(np.log10(E2)))
+    F_GFR = γ_GFR * (H(W_GFR(GFR, E2ER, ERM)) - GFR)
+    F_ERM = γ_ERM * (H(W_ERM(GFR, E2ER, ERM)) - ERM)
+    
     p = update_ghost_points(p, L, F_GFR, F_ERM)
-
-    if istep%1000==0:
-        print(istep)
-        fig = plt.figure()
-        ax = plt.axes(projection='3d')
-        surf = ax.plot_surface(GFR[1:49], ERM[1:49], -np.log(p[1:49]), cmap=cm.jet)
-        fig.colorbar(surf, shrink=0.5, aspect=5)
-        plt.show()
-
-
-
+    F_div = np.gradient(F_GFR, dL, axis=0) + np.gradient(F_ERM, dL, axis=1)#dderivatives_div(F_GFR, F_ERM, L, dL)
+    
+    for istep in range(nstep):
+    
+        grad_p = dderivatives_grad(p, L, dL)
+    
+        advection = grad_p[0]*F_GFR + grad_p[1]*F_ERM + p*F_div 
+        diffusion = dderivatives_lapl(p, L, dL)
+    
+        p = p + dt * ( -advection + diffusion)
+    
+        p = update_ghost_points(p, L, F_GFR, F_ERM)
+    
+        if istep%1000==0:
+            print(istep)
+            fig = plt.figure()
+            ax = plt.axes(projection='3d')
+            surf = ax.plot_surface(GFR[1:49], ERM[1:49], -np.log(p[1:49]), cmap=cm.jet)
+            fig.colorbar(surf, shrink=0.5, aspect=5)
+            plt.show()
+    
+    
+    
+    
